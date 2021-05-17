@@ -1,118 +1,222 @@
-const btnElement = document.querySelector('.button');
-const clicksElement = document.querySelector('#score');
-const cpsElement = document.querySelector('#cps');
-const maxCpsElement = document.querySelector('#max-cps');
-const lvlElement = document.querySelector('#lvl');
-const conditionElement = document.querySelector('#condition');
+const BUTTON = document.querySelector('#button1');
+const BUTTON2 = document.querySelector('#button2');
+const PREBUTTON = document.querySelector('#nextStageButton')
 
+const SCORE = document.querySelector('#score');
+const CPS = document.querySelector('#cps');
+const MAX_CPS = document.querySelector('#max-cps');
+const LVL = document.querySelector('#lvl');
+const CONDITION = document.querySelector('#condition');
+
+const SCORE2 = document.querySelector('#score2');
+const LVL2 = document.querySelector('#lvl2');
+const CONDITION2 = document.querySelector('#condition2');
+const MAX = document.querySelector('#max');
+const CHANSE = document.querySelector('#chance')
+
+const nextStageSound = new Audio('./sounds/nextStage.mp3');
+const nextStageClickSound = new Audio('./sounds/nextStageClick.mp3');
 const clickSound = new Audio('./sounds/click.mp3');
+const click2Sound = new Audio('./sounds/click2.mp3');
 const lvlUpSound = new Audio('./sounds/lvlUp.mp3');
+const succesSound = new Audio('./sounds/success.mp3');
+const failSound = new Audio('./sounds/fail.mp3');
 
-const LVL_UPS = [[
-        "10 CLICKS",
-        (clicks, cps) => clicks >= 10
-    ], [
-        "100 CLICKS",
-        (clicks, cps) => clicks >= 100
-    ], [
-        "500 CLICKS",
-        (clicks, cps) => clicks >= 500
-    ], [
-        "10 CLICKS",
-        (clicks, cps) => cps >= 10
-    ], [
-        "1 000 CLICKS",
-        (clicks, cps) => clicks >= 1000
-    ], [
-        "1 500 CLICKS",
-        (clicks, cps) => clicks >= 1500
-    ], [
-        "12 CPS",
-        (clicks, cps) => cps >= 12
-    ], [
-        "12 CPS & 3 000 CLICKS",
-        (clicks, cps) => clicks >= 3000
-    ], [
-        "5 000 CLICKS",
-        (clicks, cps) => clicks >= 5000
-]]
+let pressed = new Set();
 
-class Cps {
-    #clicks = [];
-    #max = +localStorage.getItem('max-cps') || 0;
-    get max() {
-        return this.#max;
+let score = localStorage.getItem('clicker:score') || 0;
+let cps = { in: 0, out: 0, max: localStorage.getItem('clicker:max') };
+let lvl = localStorage.getItem('clicker:lvl') || 1;
+let stage = localStorage.getItem('clicker:stage') || 1;
+let max = 0;
+
+
+const lvlUP = [{
+        req: "10 CLICKS",
+        cond: () => score >= 10
+    },
+    {
+        req: "100 CLICKS",
+        cond: () => score >= 100
+    },
+    {
+        req: "500 CLICKS",
+        cond: () => score >= 500
+    },
+    {
+        req: "10 CPS",
+        cond: () => cps.out >= 10
+    },
+    {
+        req: "10 CPS 1 000 CLICKS",
+        cond: () => cps.out >= 10 && score >= 1000
+    },
+    {
+        req: "1 500 CLICKS",
+        cond: () => score >= 1500
+    },
+    {
+        req: "12 CPS",
+        cond: () => cps.out >= 12
+    },
+    {
+        req: "12 CPS 3 000 CLICKS",
+        cond: () => cps.out >= 12 && score >= 3000
+    },
+    {
+        req: "5 000 CLICKS",
+        cond: () => score >= 5000
+    },
+    {
+        req: "13 CPS",
+        cond: () => cps.out >= 13
     }
-    get count() {
-        return this.#clicks.length;
+]
+const lvlUP2 = [{
+        req: "10 SCORE",
+        cond: () => score >= 10
+    },
+    {
+        req: "50 SCORE",
+        cond: () => score >= 100
+    },
+    {
+        req: "5 MAX",
+        cond: () => max >= 5
+    },
+    {
+        req: "7 MAX",
+        cond: () => max >= 7
     }
-    update() {
-        this.#clicks = [ ...this.#clicks, Date.now() ].filter(i => Date.now() <= i+1000);
-        const max = Math.max(this.max, this.count);
-        if(this.max !== max) {
-            localStorage.setItem('max-cps', max);
-            this.#max = max;
-        }
-    }
+]
+
+function update() {
+    MAX_CPS.textContent = cps.max;
+    LVL.textContent = lvlUP[lvl - 1] ? lvl : 'MAX';
+    CONDITION.textContent = `${lvlUP[lvl-1] ? lvlUP[lvl-1].req: 'DONE'}`;
+    SCORE.textContent = score.toLocaleString().replace(/,/g, ' ');
+
+    localStorage.setItem('clicker:score', score);
+    localStorage.setItem('clicker:max', cps.max);
+    localStorage.setItem('clicker:lvl', lvl);
+    localStorage.setItem('clicker:stage', stage)
 }
 
-class Clicker {
-    #cps = new Cps();
-    constructor() {
-        this.clicks = +localStorage.getItem('clicks') || 0;
-    }
-    get maxCPS() {
-        return this.#cps.max;
-    }
-    get cps() {
-        return this.#cps.count;
-    }
-    click() {
-        this.#cps.update();
-        this.clicks++;
-        localStorage.setItem('clicks', this.clicks);
-    }
+function nextStage() {
+    nextStageSound.play()
+    let preStage = document.querySelector(`.prestage`);
+    let currentStage = document.querySelector(`.stage${+stage}`);
+    currentStage.style.display = 'none';
+    preStage.style.display = 'block'
 }
 
-const clicker = new Clicker();
-
-function lvlSystem() {
-    let lvl = 0;
-    for(let [, condition] of LVL_UPS) {
-        lvl++;
-        if(!condition(clicker.clicks, clicker.cps)) break;
-    }
-    return {
-        lvl: lvl < LVL_UPS.length ? lvl : 'MAX',
-        condition: LVL_UPS[lvl-1]?.[0] || 'DONE'
-    }
+function loadStage() {
+    document.querySelector(`.stage${+stage}`).style.display = 'block';
 }
 
-let lvl = lvlSystem().lvl;
-let condition = lvlSystem().condition;
-
-function render() {
-    maxCpsElement.textContent = clicker.maxCPS;
-    cpsElement.textContent = clicker.cps;
-    lvlElement.textContent = lvl;
-    conditionElement.textContent = condition;
-    clicksElement.textContent = clicker.clicks;
-}
-
-render();
-
-btnElement.onclick = function() {
-    
-    clicker.click();
+BUTTON.onclick = function() {
+    if (pressed.size != 0) return;
     clickSound.currentTime = 0;
     clickSound.play();
 
+    score++;
+    cps.in++;
 
-    const system = lvlSystem(); 
-    condition = system.condition;
+    update();
 
-    if(system.lvl > lvl) lvlUpSound.play();
-    lvl = system.lvl;
+    if (lvlUP[lvl - 1] ? lvlUP[lvl - 1].cond() : false) {
+        lvl++
+        lvlUpSound.play();
+    }
+    if (!lvlUP[lvl - 1]) {
+        nextStage();
+    }
+}
 
-    render();
+BUTTON2.onclick = function() {
+    if (pressed.size != 0) return;
+    click2Sound.currentTime = 0;
+    click2Sound.play();
+    move()
+}
+
+PREBUTTON.onclick = function() {
+    nextStageClickSound.play()
+    let preStage = document.querySelector(`.prestage`);
+    let currentStage = document.querySelector(`.stage${+stage}`);
+    let nextStage = document.querySelector(`.stage${+stage+1}`);
+    if (!nextStage) return alert('Вы достигли максимальной стадии развития!.,@');
+    preStage.style.display = 'none';
+    currentStage.style.display = 'none';
+    stage++;
+    localStorage.setItem('clicker:stage', stage);
+    lvl = 1
+    score = 0;
+    loadStage();
+}
+
+update();
+loadStage();
+if (stage == 2) {
+    SCORE2.textContent = score.toLocaleString().replace(/,/g, ' ');
+    LVL.textContent = lvlUP2[lvl - 1] ? lvl : 'MAX';
+    CONDITION2.textContent = `${lvlUP2[lvl-1] ? lvlUP2[lvl-1].req: 'DONE'}`;
+    MAX.textContent = max;
+}
+setInterval(() => {
+    cps.out = cps.in;
+    CPS.textContent = cps.out;
+    cps.in = 0;
+
+    if (cps.out > cps.max) cps.max = cps.out;
+}, 1000)
+
+window.addEventListener('keydown', key => {
+    if (!pressed.has(key.key)) pressed.add(key.key)
+})
+window.addEventListener('keyup', key => {
+    if (pressed.has(key.key)) pressed.delete(key.key)
+})
+
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+
+function move() {
+    let elem = document.getElementById("greenBar");
+    if (parseInt(elem.style.width) > 0) return
+    let width = 0;
+    let id = setInterval(frame, 30);
+
+    function frame() {
+        if (width >= 100) {
+            clearInterval(id);
+            elem.style.width = 0 + '%'
+            if (random(0, 100) >= 50) {
+                succesSound.play()
+                score++;
+                max++
+            } else {
+                failSound.play();
+                max = 0;
+            }
+            if (lvlUP2[lvl - 1] ? lvlUP2[lvl - 1].cond() : false) {
+                lvl++
+                lvlUpSound.play();
+            }
+            if (!lvlUP2[lvl - 1]) {
+                nextStage();
+            }
+            localStorage.setItem('clicker:score', score);
+            localStorage.setItem('clicker:lvl', lvl);
+            SCORE2.textContent = score.toLocaleString().replace(/,/g, ' ');
+            LVL.textContent = lvlUP2[lvl - 1] ? lvl : 'MAX';
+            CONDITION2.textContent = `${lvlUP2[lvl-1] ? lvlUP2[lvl-1].req: 'DONE'}`;
+            MAX.textContent = max;
+        } else {
+            width++;
+            elem.style.width = width + '%';
+        }
+    }
 }

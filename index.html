@@ -12,26 +12,59 @@
 <body>
 
     <main>
-        <div class="container scores">
-            <p>
-                LVL: <span id="lvl">1</span>
-            </p> 
-            <p>
-                CPS: <span id="cps">0</span>
-            </p>
-            <p>
-                MAX CPS: <span id="max-cps">0</span>
-            </p>
-            <p id="condition">10 CLICKS</p>
-            
+        <div class='prestage'>
+            <div class="container text">
+                You have completed all the quests in the stage
+            </div>
+            <div class='container'>
+                <button class="button" id="nextStageButton">CLICK</button>
+            </div>
         </div>
-        <div class="container">
-            <p id="score">0</p>
-            <p>
-                <button class="button">CLICK</button>
-            </p>
-        </div>
+        <div class='stage1'>
+            <div class="container scores">
+                <p>
+                    LVL: <span id="lvl">1</span>
+                </p>
+                <p>
+                    CPS: <span id="cps">0</span>
+                </p>
+                <p>
+                    MAX CPS: <span id="max-cps">0</span>
+                </p>
+                <p id="condition">10 CLICKS</p>
 
+            </div>
+            <div class="container">
+                <p id="score">0</p>
+                <p>
+                    <button class="button" id='button1'>CLICK</button>
+                </p>
+            </div>
+        </div>
+        <div class="stage2">
+            <div class="container scores">
+                <p>
+                    LVL: <span id="lvl2">1</span>
+                </p>
+                <p>
+                    MAX: <span id="max">0</span>
+                </p>
+                <p>
+                    CHANCE: <span id="chance">50</span>%
+                </p>
+                <p id="condition2">10 SCORE</p>
+
+            </div>
+            <div class="container">
+                <p id="score2">0</p>
+                <div id="Progress">
+                    <div id="greenBar"></div>
+                </div>
+                <p>
+                    <button class="button" id='button2'>CLICK</button>
+                </p>
+            </div>
+        </div>
     </main>
 
 

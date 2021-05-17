@@ -12,10 +12,12 @@ html {
     overflow-y: hidden;
 }
 
-body, html {
+body,
+html {
     width: 100%;
     height: 100%;
 }
+
 body {
     background-color: #222;
     color: white;
@@ -65,7 +67,6 @@ main {
     top: 12px;
 }
 
-
 #display,
 #score {
     height: 32px;
@@ -78,4 +79,44 @@ main {
 
 p {
     margin: 12px;
+}
+
+.prestage {
+    display: none;
+}
+
+.stage1 {
+    display: none;
+}
+
+.stage2 {
+    display: none;
+}
+
+.stage3 {
+    display: none;
+}
+
+.text {
+    margin-top: 300px;
+    margin-bottom: 20px;
+    margin-left: 200px;
+    margin-right: 200px;
+    text-align: center;
+}
+
+#Progress {
+    width: 300px;
+    height: 3px;
+    border-radius: 3px;
+}
+
+#greenBar {
+    width: 0%;
+    height: 3px;
+    background-color: #c4c4c4;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    border-radius: 3px;
 }
