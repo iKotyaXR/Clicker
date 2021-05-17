@@ -60,8 +60,20 @@ const lvlUP = [{
         cond: () => cps.out >= 12
     },
     {
+        req: "2000 CLICKS",
+        cond: () => score >= 2000
+    },
+    {
         req: "12 CPS 3 000 CLICKS",
         cond: () => cps.out >= 12 && score >= 3000
+    },
+    {
+        req: "3500 CLICKS",
+        cond: () => score >= 3500
+    },
+    {
+        req: "4000 CLICKS",
+        cond: () => score >= 4000
     },
     {
         req: "5 000 CLICKS",
@@ -70,7 +82,39 @@ const lvlUP = [{
     {
         req: "13 CPS",
         cond: () => cps.out >= 13
-    }
+    },
+    {
+        req: "13 CPS 6500 CLICKS",
+        cond: () => cps.out >= 13 && score >= 6500
+    },
+    {
+        req: "7000 CLICKS",
+        cond: () => score >= 7000
+    },
+    {
+        req: "8500 CLICKS",
+        cond: () => score >= 8500
+    },
+    {
+        req: "14 CPS",
+        cond: () => cps.out >= 14
+    },
+    {
+        req: "10 000 CLICKS",
+        cond: () => score >= 10000
+    },
+    {
+        req: "14 CPS",
+        cond: () => cps.out >= 14
+    },
+    {
+        req: "14 CPS 15 000 CLICKS",
+        cond: () => cps.out >= 14 && score >= 15000
+    },
+    {
+        req: "15 CPS",
+        cond: () => cps.out >= 14
+    },
 ]
 const lvlUP2 = [{
         req: "10 SCORE",
@@ -87,7 +131,27 @@ const lvlUP2 = [{
     {
         req: "7 MAX",
         cond: () => max >= 7
-    }
+    },
+    {
+        req: "100 SCORE",
+        cond: () => score >= 100
+    },
+    {
+        req: "150 SCORE 5 MAX",
+        cond: () => score >= 150 && max >= 5
+    },
+    {
+        req: "200 SCORE",
+        cond: () => score >= 200
+    },
+    {
+        req: "10 MAX",
+        cond: () => max >= 10
+    },
+    {
+        req: "10 MAX && 500 SCORE",
+        cond: () => score >= 500 && max >= 10
+    },
 ]
 
 function update() {
